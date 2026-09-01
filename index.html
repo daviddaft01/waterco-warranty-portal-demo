@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waterco Product Warranty — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#2E69B2;
+    --navy-light:#3f7bc4;
+    --steel:#3e6680;
+    --mint:#5fae8c;
+    --mint-light:#e4f2ec;
+    --paper:#f3f6f5;
+    --paper-card:#ffffff;
+    --ink:#16273d;
+    --ink-soft:#5b6b78;
+    --line:#dbe3e2;
+    --amber:#b5762c;
+    --amber-bg:#fbf1e4;
+    --danger:#a4432f;
+    --danger-bg:#fbeae6;
+    --radius:3px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;font-size:15px;line-height:1.5;}
+  h1,h2,h3,.display{font-family:'Archivo',sans-serif;font-weight:700;letter-spacing:-0.01em;color:var(--navy);}
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+
+  /* ---- top bar ---- */
+  .topbar{background:#fff;border-bottom:1px solid var(--line);padding:0 32px;}
+  .topbar-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:72px;}
+  .wordmark img{height:32px;display:block;}
+  nav{display:flex;gap:4px;}
+  nav button{background:none;border:none;color:var(--ink-soft);padding:10px 16px;font-size:14px;font-weight:500;border-bottom:2px solid transparent;transition:color .15s;}
+  nav button:hover{color:var(--navy);}
+  nav button.active{color:var(--navy);border-bottom-color:var(--navy);font-weight:600;}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 32px 96px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ---- hero (home view) ---- */
+  .hero{display:grid;grid-template-columns:1.1fr 0.9fr;gap:56px;align-items:center;padding:24px 0 64px;border-bottom:1px solid var(--line);margin-bottom:48px;}
+  .hero h1{font-size:40px;line-height:1.08;margin:0 0 18px;max-width:9.5em;}
+  .hero p{color:var(--ink-soft);font-size:16px;max-width:34em;margin:0 0 28px;}
+  .hero-actions{display:flex;gap:12px;}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:var(--radius);font-weight:600;font-size:14px;border:1px solid transparent;transition:opacity .15s;}
+  .btn:hover{opacity:.88;}
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-secondary{background:#fff;color:var(--navy);border-color:var(--navy);}
+  .hero-card{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--radius);padding:28px;}
+  .hero-card .label{font-size:12px;color:var(--ink-soft);font-weight:500;margin-bottom:4px;}
+  .coverage-row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .coverage-row:last-child{border-bottom:none;}
+  .coverage-row .part{color:var(--ink-soft);}
+  .coverage-row .term{font-weight:600;}
+
+  /* ---- stepper ---- */
+  .stepper{display:flex;gap:0;margin-bottom:36px;border-bottom:1px solid var(--line);}
+  .step{padding:0 0 14px;margin-right:36px;font-size:14px;color:var(--ink-soft);font-weight:500;border-bottom:2px solid transparent;position:relative;top:1px;}
+  .step .n{display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--line);color:#fff;font-size:11px;text-align:center;line-height:20px;margin-right:8px;}
+  .step.done .n{background:var(--mint);}
+  .step.current{color:var(--navy);border-bottom-color:var(--navy);}
+  .step.current .n{background:var(--navy);}
+
+  .panel{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--radius);padding:32px;max-width:640px;}
+  .panel h2{font-size:20px;margin:0 0 6px;}
+  .panel .sub{color:var(--ink-soft);font-size:14px;margin:0 0 26px;}
+
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;}
+  .field .hint{font-size:12px;color:var(--ink-soft);margin-top:5px;}
+  .field input, .field select, .field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius);font-family:inherit;font-size:14px;background:#fff;color:var(--ink);}
+  .field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--steel);outline-offset:1px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .upload{border:1px dashed var(--line);border-radius:var(--radius);padding:20px;text-align:center;color:var(--ink-soft);font-size:13px;background:#fafbfb;}
+  .upload.filled{border-style:solid;border-color:var(--mint);color:var(--navy);background:var(--mint-light);}
+
+  .checkbox-list{display:flex;flex-direction:column;gap:10px;}
+  .checkbox-row{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;}
+  .checkbox-row input{width:auto;margin-top:2px;}
+
+  .panel-actions{display:flex;justify-content:space-between;margin-top:28px;}
+  .btn-text{background:none;border:none;color:var(--ink-soft);font-size:14px;font-weight:500;}
+  .btn-text:hover{color:var(--navy);}
+
+  /* ---- coverage result ---- */
+  .result-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;margin-bottom:18px;}
+  .badge-infield{background:var(--mint-light);color:#1f5a41;}
+  .badge-parts{background:var(--amber-bg);color:var(--amber);}
+  .badge-prorata{background:var(--amber-bg);color:var(--amber);}
+  .badge-out{background:var(--danger-bg);color:var(--danger);}
+  .dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+
+  .confirmation{text-align:center;padding:20px 0;}
+  .confirmation .ref{font-family:'Archivo';font-size:26px;font-weight:800;color:var(--navy);margin:10px 0 4px;}
+
+  /* ---- track view ---- */
+  .track-search{display:flex;gap:10px;max-width:480px;margin-bottom:32px;}
+  .track-search input{flex:1;padding:11px 14px;border:1px solid var(--line);border-radius:var(--radius);font-family:inherit;font-size:14px;}
+  .timeline{max-width:640px;}
+  .tl-item{display:flex;gap:16px;padding-bottom:26px;position:relative;}
+  .tl-item:not(:last-child)::before{content:'';position:absolute;left:9px;top:22px;bottom:0;width:1px;background:var(--line);}
+  .tl-dot{width:19px;height:19px;border-radius:50%;background:var(--line);flex-shrink:0;margin-top:2px;}
+  .tl-item.done .tl-dot{background:var(--mint);}
+  .tl-item.current .tl-dot{background:var(--navy);}
+  .tl-body .stage{font-weight:600;font-size:14.5px;}
+  .tl-body .desc{color:var(--ink-soft);font-size:13px;margin-top:2px;}
+  .empty-state{color:var(--ink-soft);font-size:14px;padding:24px 0;}
+
+  footer{max-width:1080px;margin:0 auto;padding:24px 32px;color:var(--ink-soft);font-size:12.5px;border-top:1px solid var(--line);}
+
+  /* ---- warranty terms page ---- */
+  .terms-intro{max-width:640px;margin:0 0 28px;}
+  .terms-intro h2{font-size:26px;margin:0 0 10px;}
+  .terms-intro p{color:var(--ink-soft);font-size:15px;margin:0;}
+  .labour-banner{display:flex;gap:16px;align-items:center;background:var(--navy);color:#fff;border-radius:var(--radius);padding:18px 22px;margin-bottom:36px;}
+  .labour-banner .figure{font-family:'Archivo';font-weight:800;font-size:26px;line-height:1;flex-shrink:0;}
+  .labour-banner .figure span{display:block;font-family:'Inter';font-weight:500;font-size:11px;color:#e3edf7;margin-top:3px;}
+  .labour-banner p{margin:0;font-size:13.5px;color:#eaf1f9;max-width:34em;}
+  .labour-banner p b{color:#fff;font-weight:600;}
+
+  .terms-group{margin-bottom:8px;}
+  .terms-group-name{font-family:'Archivo';font-weight:700;font-size:13px;color:var(--steel);padding:22px 0 8px;border-bottom:1px solid var(--line);}
+  table.terms-table{width:100%;border-collapse:collapse;margin-bottom:4px;}
+  table.terms-table tr{border-bottom:1px solid var(--line);}
+  table.terms-table td{padding:11px 4px;font-size:14px;vertical-align:top;}
+  table.terms-table td.t-component{color:var(--ink);width:46%;}
+  table.terms-table td.t-warranty{font-weight:600;white-space:nowrap;width:16%;}
+  table.terms-table td.t-note{color:var(--ink-soft);font-size:12.5px;width:38%;}
+  .terms-footnote{color:var(--ink-soft);font-size:12.5px;max-width:680px;margin-top:32px;padding-top:20px;border-top:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="wordmark"><img src="data:image/png;base64,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" alt="Waterco — Water, the liquid of life"></div>
+    <nav>
+      <button data-view="home" class="active">Home</button>
+      <button data-view="register">Register a product</button>
+      <button data-view="claim">Lodge a claim</button>
+      <button data-view="track">Track a claim</button>
+      <button data-view="terms">Warranty terms</button>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- HOME -->
+  <section class="view active" id="home">
+    <div class="hero">
+      <div>
+        <h1>Register your pool equipment. Know what's covered, from day one.</h1>
+        <p>Add the serial number on your Waterco pump, chlorinator, filter or heat pump, and we'll tell you exactly what's covered and until when — in-field service, parts, the lot.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="showView('register')">Register a product</button>
+          <button class="btn btn-secondary" onclick="showView('claim')">Lodge a claim</button>
+        </div>
+        <p style="margin-top:16px;"><a href="#" onclick="showView('terms');return false;" style="color:var(--steel);font-size:13.5px;font-weight:600;">See full warranty terms →</a></p>
+      </div>
+      <div class="hero-card">
+        <div class="label">Example — HydroChlor 45 salt chlorinator, purchased 14 months ago</div>
+        <div class="coverage-row"><span class="part">In-field service</span><span class="term" style="color:var(--amber)">Expired at 12 months</span></div>
+        <div class="coverage-row"><span class="part">Cell</span><span class="term" style="color:#1f5a41">Covered — parts only, until year 3</span></div>
+        <div class="coverage-row"><span class="part">Power pack</span><span class="term" style="color:#1f5a41">Covered — parts only, until year 3</span></div>
+      </div>
+    </div>
+    <p style="color:var(--ink-soft);font-size:13px;max-width:640px;">This is a working prototype demonstrating the registration → claim → tracking flow against a mock warranty ruleset. Sample data only — nothing here is submitted anywhere.</p>
+  </section>
+
+  <!-- REGISTER -->
+  <section class="view" id="register">
+    <div class="stepper" id="reg-stepper"></div>
+    <div id="reg-content"></div>
+  </section>
+
+  <!-- CLAIM -->
+  <section class="view" id="claim">
+    <div class="stepper" id="claim-stepper"></div>
+    <div id="claim-content"></div>
+  </section>
+
+  <!-- TRACK -->
+  <section class="view" id="track">
+    <h2 style="margin-bottom:6px;">Track a claim</h2>
+    <p style="color:var(--ink-soft);font-size:14px;margin:0 0 24px;">Enter the reference number from your claim confirmation email.</p>
+    <div class="track-search">
+      <input type="text" id="track-input" placeholder="e.g. WC-2026-000123">
+      <button class="btn btn-primary" onclick="trackClaim()">Track</button>
+    </div>
+    <div id="track-result"><div class="empty-state">No claim looked up yet — try a reference from a claim you've just lodged, or use the sample below.</div></div>
+    <button class="btn-text" style="margin-top:8px;" onclick="document.getElementById('track-input').value=sampleRef; trackClaim();">Use sample reference</button>
+  </section>
+
+  <!-- WARRANTY TERMS -->
+  <section class="view" id="terms">
+    <div class="terms-intro">
+      <h2>Warranty terms</h2>
+      <p>Residential products only. Effective June 2025, pump motor cover updated 2026. Full conditions and exclusions apply — see the Waterco Warranty Booklet for complete terms.</p>
+    </div>
+    <div class="labour-banner">
+      <div class="figure">12<span>months</span></div>
+      <p><b>In-field labour is covered for 12 months</b> from the date of purchase or installation, within 25 km of an authorised Waterco Service Agent. Outside that radius, or after 12 months, freight and on-site labour are the purchaser's responsibility — the part periods below still apply.</p>
+    </div>
+    <div id="terms-table"></div>
+    <div class="terms-footnote">Warranty periods shown are for parts only and apply from the original purchase date by the end user. Spare parts fitted during a repair carry their own fresh 12-month warranty. Some items carry a pro-rata cost-share period after their flat warranty expires — see the "Notes" column. This warranty is not transferable from the original purchaser and is in addition to your rights under the Australian Consumer Law.</div>
+  </section>
+
+</div>
+
+<footer>Waterco Consumer Warranty Portal — demonstration build. Warranty terms shown are illustrative and based on the June 2025 Waterco Warranty Booklet (residential products).</footer>
+
+<script>
+/* ---------------- mock catalogue + component terms ---------------- */
+const products = [
+  {id:'ecov', category:'Pumps', name:'EcoV Variable Speed Pump', requiresSerial:true},
+  {id:'hydrochlor45', category:'Salt Chlorinators', name:'HydroChlor 45', requiresSerial:true},
+  {id:'ecovs', category:'Heat Pumps', name:'Electroheat ECO-VS', requiresSerial:true},
+  {id:'multicyclone', category:'Filters', name:'MultiCyclone 15', requiresSerial:true},
+];
+
+const componentTerms = {
+  'Pumps': [
+    {component:'Wet ends', years:3},
+    {component:'Motor', years:3, note:'Updated 2026 — was 2 years'},
+    {component:'Mechanical seal, O-ring, basket, impeller & diffuser', years:2},
+    {component:'Portapac / Delta Spa & Bath pumps (all parts)', years:2, note:'Product-specific cap — see exceptions'},
+    {component:'Fulflo pressure pump (all parts)', years:2, note:'Product-specific cap — see exceptions'},
+  ],
+  'Salt Chlorinators': [
+    {component:'Cell', years:3},
+    {component:'Premium cell', years:4},
+    {component:'Power pack', years:3},
+  ],
+  'Heat Pumps': [
+    {component:'Compressor', years:3},
+    {component:'Titanium heat exchanger (corrosion, eff. 1 Aug 2022)', years:25},
+    {component:'All other components', years:2},
+  ],
+  'Filters': [
+    {component:'Thermoplastic filter tank', years:5, proRata:'Then pro-rata to year 10 (Column A)'},
+    {component:'Filament Wound / Exotuf filter tank', years:10},
+    {component:'Cartridge / Bag filter tank', years:10},
+    {component:'DE filter tank', years:3, proRata:'Then pro-rata to year 5 (Column B)'},
+    {component:'MultiCyclone 12-16 & 12-16 Plus / Ultra', years:3},
+    {component:'Opal Ultra tank', years:10},
+    {component:'MultiCyclone DUO tank', years:10},
+    {component:'MultiCyclone components', years:3},
+    {component:'Internal parts (fittings, valves, gauges, cartridge elements, DE/Pearlite grids)', years:1},
+    {component:'Multiport valves (granular media / DE / Pearlite)', years:3},
+  ],
+  'ChemFlo Plus': [
+    {component:'Controller / Feeder', years:3},
+    {component:'Sensor', years:1},
+  ],
+  'Gas Heater & Digiheat': [
+    {component:'Gas Heater', years:2},
+    {component:'Digiheat', years:2},
+  ],
+  'Robotic Cleaners': [
+    {component:'Dolphin ECO / E10, ECO Plus, X25/HYDRO', years:2, note:'Limited warranty'},
+    {component:'Dolphin HYDRO Plus IoT, ULTRA IoT', years:2},
+    {component:'Dolphin Ultimate', years:3},
+  ],
+  'Suction Cleaners': [
+    {component:'Swimkleen 2 main body / 1m hose', years:2},
+    {component:'Swimkleen 2 components (Flexifoot, disk, wheel, diaphragm, pivot)', years:1},
+    {component:'Swimkleen NAV V-Flex', years:3},
+    {component:'Swimkleen ATV', years:4, proRata:'Plus 3 years pro-rata — schedule to be confirmed'},
+  ],
+  'Pool Lights & Accessories': [
+    {component:'Britestream LED pool lights', years:2},
+    {component:'Litestream LED pool lights, pool light transformers', years:1},
+  ],
+  'Infloor Cleaning': [
+    {component:'Bluesquare components (new installations only)', years:3},
+  ],
+  'General Pool Equipment': [
+    {component:'Pool care tools / hand-over equipment', years:2},
+    {component:'Skimmer box, lid and rings', years:1},
+  ],
+  'Automation Products': [
+    {component:'Waterco Controllers', years:2},
+    {component:'Waterco Temperature Sensor', years:1},
+    {component:'Smart Controllers', years:3},
+  ],
+};
+
+const IN_FIELD_MONTHS = 12;
+
+/* ---------------- state ---------------- */
+let registrations = JSON.parse(localStorage.getItem('wc_registrations') || '[]');
+let claims = JSON.parse(localStorage.getItem('wc_claims') || '[]');
+let sampleRef = null;
+
+function saveState(){
+  localStorage.setItem('wc_registrations', JSON.stringify(registrations));
+  localStorage.setItem('wc_claims', JSON.stringify(claims));
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+  if(name==='register') renderRegister();
+  if(name==='claim') renderClaim();
+  if(name==='terms') renderTerms();
+}
+
+/* ---------------- WARRANTY TERMS PAGE ---------------- */
+function renderTerms(){
+  const el = document.getElementById('terms-table');
+  el.innerHTML = Object.keys(componentTerms).map(group => `
+    <div class="terms-group">
+      <div class="terms-group-name">${group}</div>
+      <table class="terms-table">
+        ${componentTerms[group].map(t => `
+          <tr>
+            <td class="t-component">${t.component}</td>
+            <td class="t-warranty">${t.years} ${t.years===1?'year':'years'}</td>
+            <td class="t-note">${t.note || t.proRata || ''}</td>
+          </tr>`).join('')}
+      </table>
+    </div>`).join('');
+}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+
+/* ---------------- REGISTRATION WIZARD ---------------- */
+let regStep = 1;
+let regData = {};
+
+function renderStepper(el, steps, current){
+  el.innerHTML = steps.map((label,i)=>{
+    const n = i+1;
+    const cls = n<current ? 'done' : (n===current ? 'current' : '');
+    return `<div class="step ${cls}"><span class="n">${n<current?'✓':n}</span>${label}</div>`;
+  }).join('');
+}
+
+function renderRegister(){
+  const steps = ['Product','Purchase details','Proof of purchase','Confirmation'];
+  renderStepper(document.getElementById('reg-stepper'), steps, regStep);
+  const c = document.getElementById('reg-content');
+
+  if(regStep===1){
+    c.innerHTML = `
+      <div class="panel">
+        <h2>Which product are you registering?</h2>
+        <p class="sub">Select the model, then enter the serial number from the sticker on the unit.</p>
+        <div class="field">
+          <label>Product model</label>
+          <select id="f-product">
+            <option value="">Choose a model…</option>
+            ${products.map(p=>`<option value="${p.id}">${p.name} — ${p.category}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Serial number</label>
+          <input id="f-serial" placeholder="Found on the product sticker">
+          <div class="hint">Every complete Waterco product carries a serial sticker — check the unit body or the original box.</div>
+        </div>
+        <div class="panel-actions">
+          <span></span>
+          <button class="btn btn-primary" onclick="regNext1()">Continue</button>
+        </div>
+      </div>`;
+  }
+  if(regStep===2){
+    c.innerHTML = `
+      <div class="panel">
+        <h2>Purchase &amp; installation</h2>
+        <p class="sub">This is what we use to work out your coverage dates.</p>
+        <div class="field-row">
+          <div class="field"><label>Purchase date</label><input type="date" id="f-purchase"></div>
+          <div class="field"><label>Installation date (if different)</label><input type="date" id="f-install"></div>
+        </div>
+        <div class="field"><label>Where did you buy it?</label><input id="f-dealer" placeholder="Dealer or store name"></div>
+        <div class="field">
+          <label>Was it installed by a licensed or suitably qualified installer?</label>
+          <select id="f-installer-qual">
+            <option value="yes">Yes</option>
+            <option value="no">No / not sure</option>
+          </select>
+          <div class="hint">This is a condition of warranty for products requiring installation.</div>
+        </div>
+        <div class="panel-actions">
+          <button class="btn-text" onclick="regStep=1;renderRegister();">Back</button>
+          <button class="btn btn-primary" onclick="regNext2()">Continue</button>
+        </div>
+      </div>`;
+  }
+  if(regStep===3){
+    c.innerHTML = `
+      <div class="panel">
+        <h2>Proof of purchase</h2>
+        <p class="sub">Upload your invoice or receipt — this is required to validate any future claim.</p>
+        <div class="field">
+          <div class="upload ${regData.proofUploaded?'filled':''}" id="upload-box" onclick="mockUpload()">
+            ${regData.proofUploaded ? '✓ receipt.pdf attached' : 'Click to attach a file (demo — no real upload)'}
+          </div>
+        </div>
+        <div class="panel-actions">
+          <button class="btn-text" onclick="regStep=2;renderRegister();">Back</button>
+          <button class="btn btn-primary" onclick="regSubmit()">Submit registration</button>
+        </div>
+      </div>`;
+  }
+  if(regStep===4){
+    const terms = componentTerms[regData.category] || [];
+    c.innerHTML = `
+      <div class="panel" style="max-width:560px;">
+        <div class="confirmation">
+          <div style="color:var(--mint);font-size:32px;">✓</div>
+          <h2 style="margin-top:8px;">Registration complete</h2>
+          <p class="sub">${regData.productName} — here's what's covered.</p>
+        </div>
+        <div class="coverage-row"><span class="part">In-field service</span><span class="term">Until ${addMonths(regData.purchase,IN_FIELD_MONTHS)}</span></div>
+        ${terms.map(t=>`<div class="coverage-row"><span class="part">${t.component}</span><span class="term">Until ${addMonths(regData.purchase,t.years*12)}</span></div>`).join('')}
+        <div class="panel-actions">
+          <span></span>
+          <button class="btn btn-primary" onclick="showView('home')">Done</button>
+        </div>
+      </div>`;
+  }
+}
+
+function mockUpload(){
+  regData.proofUploaded = true;
+  document.getElementById('upload-box').classList.add('filled');
+  document.getElementById('upload-box').textContent = '✓ receipt.pdf attached';
+}
+
+function regNext1(){
+  const pid = document.getElementById('f-product').value;
+  const serial = document.getElementById('f-serial').value.trim();
+  if(!pid || !serial){ alert('Please select a product and enter the serial number.'); return; }
+  const p = products.find(x=>x.id===pid);
+  regData.productId = pid; regData.productName = p.name; regData.category = p.category; regData.serial = serial;
+  regStep = 2; renderRegister();
+}
+function regNext2(){
+  const purchase = document.getElementById('f-purchase').value;
+  if(!purchase){ alert('Please enter a purchase date.'); return; }
+  regData.purchase = purchase;
+  regData.install = document.getElementById('f-install').value;
+  regData.dealer = document.getElementById('f-dealer').value;
+  regData.installerQual = document.getElementById('f-installer-qual').value;
+  regStep = 3; renderRegister();
+}
+function regSubmit(){
+  if(!regData.proofUploaded){ alert('Please attach proof of purchase.'); return; }
+  registrations.push({...regData, id:'REG-'+Date.now()});
+  saveState();
+  regStep = 4; renderRegister();
+}
+
+/* ---------------- CLAIM WIZARD ---------------- */
+let claimStep = 1;
+let claimData = {};
+
+function renderClaim(){
+  const steps = ['Find registration','Describe the fault','Conditions','Result'];
+  renderStepper(document.getElementById('claim-stepper'), steps, claimStep);
+  const c = document.getElementById('claim-content');
+
+  if(claimStep===1){
+    const opts = registrations.length
+      ? registrations.map((r,i)=>`<option value="${i}">${r.productName} — ${r.serial}</option>`).join('')
+      : '';
+    c.innerHTML = `
+      <div class="panel">
+        <h2>Which product needs a claim?</h2>
+        <p class="sub">Choose from your registered products, or use the sample below if you haven't registered one in this demo yet.</p>
+        <div class="field">
+          <label>Registered product</label>
+          <select id="f-claim-reg">
+            <option value="">Choose…</option>
+            ${opts}
+            <option value="sample">Sample: EcoV pump, purchased 18 months ago</option>
+          </select>
+        </div>
+        <div class="panel-actions">
+          <span></span>
+          <button class="btn btn-primary" onclick="claimNext1()">Continue</button>
+        </div>
+      </div>`;
+  }
+  if(claimStep===2){
+    const terms = componentTerms[claimData.category] || [];
+    c.innerHTML = `
+      <div class="panel">
+        <h2>What's gone wrong?</h2>
+        <div class="field">
+          <label>Which part is affected?</label>
+          <select id="f-fault-component">
+            ${terms.map(t=>`<option value="${t.component}">${t.component}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Fault type</label>
+          <select id="f-fault-type">
+            <option>No power</option><option>Leaking</option><option>Error code</option><option>Noise</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Describe the fault</label>
+          <textarea id="f-fault-desc" rows="3" placeholder="What's happening, and when did you first notice it?"></textarea>
+        </div>
+        <div class="panel-actions">
+          <button class="btn-text" onclick="claimStep=1;renderClaim();">Back</button>
+          <button class="btn btn-primary" onclick="claimNext2()">Continue</button>
+        </div>
+      </div>`;
+  }
+  if(claimStep===3){
+    c.innerHTML = `
+      <div class="panel">
+        <h2>Before you submit</h2>
+        <p class="sub">A few conditions apply to every Waterco warranty claim.</p>
+        <div class="checkbox-list">
+          <label class="checkbox-row"><input type="checkbox" checked> Installed and operated per the written instructions provided</label>
+          <label class="checkbox-row"><input type="checkbox" checked> Regularly serviced/maintained</label>
+          <label class="checkbox-row"><input type="checkbox" checked> Pool water chemistry kept within the recommended range (pH 7.2–7.6)</label>
+          <label class="checkbox-row"><input type="checkbox" checked> No unauthorised repairs or modifications made</label>
+        </div>
+        <div class="field" style="margin-top:18px;">
+          <div class="upload" onclick="this.classList.add('filled');this.textContent='✓ fault_photo.jpg attached'">Click to attach a photo of the fault (demo)</div>
+        </div>
+        <div class="panel-actions">
+          <button class="btn-text" onclick="claimStep=2;renderClaim();">Back</button>
+          <button class="btn btn-primary" onclick="claimSubmit()">Submit claim</button>
+        </div>
+      </div>`;
+  }
+  if(claimStep===4){
+    const res = claimData.result;
+    const badgeClass = {in_field:'badge-infield', parts_only:'badge-parts', pro_rata:'badge-prorata', out_of_warranty:'badge-out'}[res.determination];
+    const label = {in_field:'Likely covered — in-field service', parts_only:'Likely covered — parts only', pro_rata:'Pro-rata cost-share applies', out_of_warranty:'Outside standard warranty'}[res.determination];
+    c.innerHTML = `
+      <div class="panel" style="max-width:560px;">
+        <div class="confirmation">
+          <div style="color:var(--mint);font-size:32px;">✓</div>
+          <h2 style="margin-top:8px;">Claim submitted</h2>
+          <div class="ref">${claimData.ref}</div>
+          <p class="sub">Save this reference to track your claim.</p>
+        </div>
+        <div class="result-badge ${badgeClass}"><span class="dot"></span>${label}</div>
+        <p style="font-size:13.5px;color:var(--ink-soft);">This is an indicative result based on ${claimData.monthsSince} months since purchase. Your assigned State Warranty Manager will confirm the outcome after review.</p>
+        <div class="panel-actions">
+          <span></span>
+          <button class="btn btn-primary" onclick="document.getElementById('track-input').value=claimData.ref; showView('track'); trackClaim();">Track this claim</button>
+        </div>
+      </div>`;
+  }
+}
+
+function claimNext1(){
+  const sel = document.getElementById('f-claim-reg').value;
+  if(!sel){ alert('Please choose a product.'); return; }
+  if(sel==='sample'){
+    const d = new Date(); d.setMonth(d.getMonth()-18);
+    claimData = {productName:'EcoV Variable Speed Pump', category:'Pumps', serial:'EV-SAMPLE-001', purchase:d.toISOString().slice(0,10)};
+  } else {
+    const r = registrations[sel];
+    claimData = {productName:r.productName, category:r.category, serial:r.serial, purchase:r.purchase};
+  }
+  claimStep = 2; renderClaim();
+}
+function claimNext2(){
+  claimData.faultComponent = document.getElementById('f-fault-component').value;
+  claimData.faultType = document.getElementById('f-fault-type').value;
+  claimData.faultDesc = document.getElementById('f-fault-desc').value;
+  claimStep = 3; renderClaim();
+}
+function claimSubmit(){
+  const months = monthsBetween(new Date(claimData.purchase), new Date());
+  const terms = componentTerms[claimData.category] || [];
+  const term = terms.find(t=>t.component===claimData.faultComponent) || {years:1};
+  const labourCovered = months <= IN_FIELD_MONTHS;
+  const partsCovered = months <= term.years*12;
+  let determination = 'out_of_warranty';
+  if(labourCovered && partsCovered) determination = 'in_field';
+  else if(partsCovered) determination = 'parts_only';
+  else if(term.proRata) determination = 'pro_rata';
+
+  claimData.monthsSince = months;
+  claimData.result = {determination};
+  claimData.ref = 'WC-2026-' + String(100000+Math.floor(Math.random()*899999)).slice(0,6);
+  claimData.status = determination==='out_of_warranty' ? 'submitted' : 'submitted';
+  claimData.submittedAt = new Date().toISOString();
+  claims.push({...claimData});
+  saveState();
+  if(!sampleRef) sampleRef = claimData.ref;
+  claimStep = 4; renderClaim();
+}
+
+/* ---------------- TRACKING ---------------- */
+function trackClaim(){
+  const ref = document.getElementById('track-input').value.trim();
+  const claim = claims.find(c=>c.ref===ref);
+  const el = document.getElementById('track-result');
+  if(!claim){
+    el.innerHTML = `<div class="empty-state">No claim found for "${ref}". Try lodging one first, or use the sample reference below.</div>`;
+    return;
+  }
+  const stages = ['submitted','under_review', claim.result.determination==='in_field'?'approved_in_field':'approved_parts_only','scheduled','completed'];
+  const stageLabels = {
+    submitted:'Submitted', under_review:'Being assessed by your State Warranty Manager',
+    approved_in_field:'Approved — in-field service', approved_parts_only:'Approved — parts only',
+    scheduled:'Service scheduled', completed:'Completed'
+  };
+  const currentIndex = 1; // demo always shows "under review" as the live stage
+  el.innerHTML = `
+    <div style="margin-bottom:20px;">
+      <div style="font-weight:700;font-family:'Archivo';font-size:17px;">${claim.productName}</div>
+      <div style="color:var(--ink-soft);font-size:13px;">Serial ${claim.serial} · Fault: ${claim.faultComponent} — ${claim.faultType}</div>
+    </div>
+    <div class="timeline">
+      ${stages.map((s,i)=>`
+        <div class="tl-item ${i<currentIndex?'done':(i===currentIndex?'current':'')}">
+          <div class="tl-dot"></div>
+          <div class="tl-body">
+            <div class="stage">${stageLabels[s]}</div>
+            ${i===currentIndex?'<div class="desc">Your local branch has this claim and will be in touch if anything further is needed.</div>':''}
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+/* ---------------- helpers ---------------- */
+function monthsBetween(d1,d2){
+  return (d2.getFullYear()-d1.getFullYear())*12 + (d2.getMonth()-d1.getMonth());
+}
+function addMonths(dateStr, months){
+  const d = new Date(dateStr);
+  d.setMonth(d.getMonth()+months);
+  return d.toLocaleDateString('en-AU',{year:'numeric',month:'short',day:'numeric'});
+}
+
+renderRegister();
+renderClaim();
+renderTerms();
+</script>
+</body>
+</html>
